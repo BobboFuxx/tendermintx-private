@@ -223,6 +223,12 @@ impl TendermintXOperator {
     }
 
     async fn create_proof(&mut self, current_block_input: u64, target_block_input: u64) {
+        if current_block_input >= target_block_input {
+            println!("Invalid block input");
+            println!("Current block: {}", current_block_input);
+            println!("Target block: {}", target_block_input);
+            return;
+        }
         // The upper limit of the largest skip that can be requested. This is bounded by the unbonding
         // period, which for most Tendermint chains is ~2 weeks, or ~100K blocks with a block time
         // of 12s.
@@ -240,12 +246,14 @@ impl TendermintXOperator {
         let latest_block = latest_signed_header.header.height.value();
 
         // Get the maximum block height we can request.
-        let max_end_block = std::cmp::min(latest_block, current_block + skip_max);
+        // let max_end_block = std::cmp::min(latest_block, current_block + skip_max);
 
-        let target_block = self
-            .data_fetcher
-            .find_block_to_request(current_block, max_end_block)
-            .await;
+        // let target_block = self
+        //     .data_fetcher
+        //     .find_block_to_request(current_block, max_end_block)
+        //     .await;
+
+        let target_block = target_block_input;
 
         println!("Current block: {}", current_block);
         println!("Target block: {}", target_block);
@@ -253,8 +261,8 @@ impl TendermintXOperator {
         // let target_block = target_block_input;
         println!("New target block: {}", target_block);
 
-        // info!("request____start:{}request____end", "123123123");
-        // return;
+        info!("request____start:{}request____end", "123123123");
+        return;
 
         if target_block - current_block == 1 {
             // Request the step if the target block is the next block.
