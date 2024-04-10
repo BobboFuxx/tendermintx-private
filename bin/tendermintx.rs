@@ -222,12 +222,13 @@ impl TendermintXOperator {
         }
     }
 
-    async fn create_proof(&mut self, height: u64) {
+    async fn create_proof(&mut self, current_block_input: u64, target_block_input: u64) {
         // The upper limit of the largest skip that can be requested. This is bounded by the unbonding
         // period, which for most Tendermint chains is ~2 weeks, or ~100K blocks with a block time
         // of 12s.
         let skip_max = self.contract.skip_max().await.unwrap();
         let current_block = self.contract.latest_block().await.unwrap();
+        let current_block = current_block_input;
 
         // Consistency check for the headers (this should only happen if an invalid header,
         // typically the genesis header, is pushed to the contract). If this is triggered,
@@ -241,17 +242,25 @@ impl TendermintXOperator {
         // Get the maximum block height we can request.
         let max_end_block = std::cmp::min(latest_block, current_block + skip_max);
 
-        // let target_block = self
-        //     .data_fetcher
-        //     .find_block_to_request(current_block, max_end_block)
-        //     .await;
+        let target_block = self
+            .data_fetcher
+            .find_block_to_request(current_block, max_end_block)
+            .await;
 
-        let target_block = height;
+        println!("Current block: {}", current_block);
+        println!("Target block: {}", target_block);
+
+        // let target_block = target_block_input;
+        println!("New target block: {}", target_block);
+
+        // info!("request____start:{}request____end", "123123123");
+        // return;
 
         if target_block - current_block == 1 {
             // Request the step if the target block is the next block.
             match self.request_step(current_block).await {
                 Ok(request_id) => {
+                    info!("request____start:{}request____end", request_id);
                     info!("Step request submitted: {}", request_id)
                 }
                 Err(e) => {
@@ -263,6 +272,7 @@ impl TendermintXOperator {
             // Request a skip if the target block is not the next block.
             match self.request_skip(current_block, target_block).await {
                 Ok(request_id) => {
+                    info!("request____start:{}request____end", request_id);
                     info!("Skip request submitted: {}", request_id)
                 }
                 Err(e) => {
@@ -287,15 +297,16 @@ impl TendermintXOperator {
 #[tokio::main]
 async fn main() {
     /*
-        cargo run --package tendermintx --bin tendermintx --release 123456
+        cargo run --package tendermintx --bin tendermintx --release 123456 654321
     */
     let args: Vec<String> = std::env::args().collect();
-    let height = args[1].parse::<u64>().unwrap();
+    let trusted = args[1].parse::<u64>().unwrap();
+    let height = args[2].parse::<u64>().unwrap();
     println!("Proof height: {}", height);
     env::set_var("RUST_LOG", "info");
     dotenv::dotenv().ok();
     env_logger::init();
 
     let mut operator = TendermintXOperator::new();
-    operator.create_proof(height).await;
+    operator.create_proof(trusted, height).await;
 }
