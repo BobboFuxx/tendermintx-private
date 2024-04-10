@@ -261,8 +261,8 @@ impl TendermintXOperator {
         // let target_block = target_block_input;
         println!("New target block: {}", target_block);
 
-        info!("request____start:{}request____end", "123123123");
-        return;
+        // info!("request____start:{}request____end", "123123123");
+        // return;
 
         if target_block - current_block == 1 {
             // Request the step if the target block is the next block.
