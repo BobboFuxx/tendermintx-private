@@ -327,7 +327,7 @@ impl TendermintXOperator {
             // Request the step if the target block is the next block.
             match self.request_step_2(trusted_hash, current_block).await {
                 Ok(request_id) => {
-                    info!("request____start:{}request____end", request_id);
+                    info!("request____start{}request____end", request_id);
                     info!("Step request submitted: {}", request_id)
                 }
                 Err(e) => {
@@ -342,7 +342,7 @@ impl TendermintXOperator {
                 .await
             {
                 Ok(request_id) => {
-                    info!("request____start:{}request____end", request_id);
+                    info!("request____start{}request____end", request_id);
                     info!("Skip request submitted: {}", request_id)
                 }
                 Err(e) => {
