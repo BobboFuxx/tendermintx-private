@@ -282,9 +282,10 @@ impl TendermintXOperator {
         target_block_input: u64,
     ) {
         if current_block_input >= target_block_input {
-            println!("Invalid block input");
-            println!("Current block: {}", current_block_input);
-            println!("Target block: {}", target_block_input);
+            error!("Invalid block input");
+            error!("Current block: {}", current_block_input);
+            error!("Target block: {}", target_block_input);
+            error!("trusted_hash: {:?}", trusted_hash);
             return;
         }
         // The upper limit of the largest skip that can be requested. This is bounded by the unbonding
